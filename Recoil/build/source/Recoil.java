@@ -15,14 +15,15 @@ import java.io.IOException;
 public class Recoil extends PApplet {
 
 int gameState = 0;
-int ballX, ballY;
-int ballSize = 20;
+
 int ballColor = color(0);
+float ballX, ballY;
+int ballSize = 20;
 
 int racketColor = color(0);
 float racketWidth = 100;
 float racketHeight = 10;
-
+int racketBounceRate = 20;
 
 float gravity = 1;
 float ballSpeedVert = 0;
@@ -55,6 +56,7 @@ public void gameScreen() {
   background(255);
   drawBall();
   drawRacket();
+  watchRacketBounce();
   applyGravity();
   keepInScreen();
 }
@@ -91,14 +93,35 @@ public void applyGravity() {
 
 public void keepInScreen() {
   if (ballY + (ballSize / 2) > height) {
-    ballY = height - (ballSize / 2);
-    ballSpeedVert *= -1;
-    ballSpeedVert -= (ballSpeedVert * friction);
+    makeBounceBottom(height);
   }
   if (ballY + (ballSize / 2) < 0) {
-    ballY = 0 + (ballSize / 2);
-    ballSpeedVert *= -1;
-    ballSpeedVert -= (ballSpeedVert * friction);
+    makeBounceTop(0);
+  }
+}
+
+public void makeBounceBottom(float surface) {
+  ballY = surface - (ballSize / 2);
+  ballSpeedVert *= -1;
+  ballSpeedVert -= (ballSpeedVert * friction);
+}
+
+public void makeBounceTop(float surface) {
+  ballY = surface + (ballSize / 2);
+  ballSpeedVert *= -1;
+  ballSpeedVert -= (ballSpeedVert * friction);
+}
+
+public void watchRacketBounce() {
+  float overhead = mouseY - pmouseY;
+  if ((ballX + (ballSize / 2) > mouseX - (racketWidth / 2)) && (ballX - (ballSize /2) < mouseX + (racketWidth / 2))) {
+    if (dist(ballX, ballY, ballX, mouseY) <= (ballSize / 2) + abs(overhead)) {
+      makeBounceBottom(mouseY);
+      if (overhead < 0) {
+        ballY += overhead;
+        ballSpeedVert += overhead;
+      }
+    }
   }
 }
   public void settings() {  size(500, 500); }
