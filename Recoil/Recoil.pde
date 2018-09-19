@@ -1,3 +1,4 @@
+// GUIDE: https://www.toptal.com/game/ultimate-guide-to-processing-simple-game
 int gameState = 0;
 int score;
 
