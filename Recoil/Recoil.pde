@@ -1,8 +1,11 @@
 int gameState = 0;
+int score;
 
 color ballColor = color(0);
 float ballX, ballY;
 int ballSize = 20;
+float ballSpeedVert = 0;
+float ballSpeedHorizon = 0;
 
 color racketColor = color(0);
 float racketWidth = 100;
@@ -19,9 +22,12 @@ color wallColors = color(0);
 
 ArrayList<int[]> walls = new ArrayList<int[]>();
 
+int maxHealth = 100;
+float health = 100;
+float healthDecrease = 1;
+int healthBarWidth = 60;
+
 float gravity = 1;
-float ballSpeedVert = 0;
-float ballSpeedHorizon = 10;
 float airFriction = 0.0002;
 float friction = 0.15;
 
@@ -44,14 +50,18 @@ void draw() {
 void initScreen() {
   background(0);
   textAlign(CENTER);
-  textSize(20);
-  text("Click to Start", height / 2, width / 2);
+  textSize(30);
+  text("Recoil", height / 2, width / 2 - 30);
+  textSize(15);
+  text("Click to Start", height / 2, width / 2 + 10);
 }
 void gameScreen() {
   background(255);
   noCursor();
   drawBall();
   drawRacket();
+  drawHealthBar();
+  printScore();
   watchRacketBounce();
   wallAdder();
   wallHandler();
@@ -60,12 +70,23 @@ void gameScreen() {
   keepInScreen();
 }
 void gameOverScreen() {
-
+  background(0);
+  cursor();
+  textAlign(CENTER);
+  fill(255);
+  textSize(30);
+  printScore();
+  text("Game Over!", height / 2, width / 2 - 20);
+  textSize(15);
+  text("Click to Restart.", height / 2, width / 2 + 10);
 }
 
 public void mousePressed() {
   if (gameState == 0) {
     startGame();
+  }
+  if (gameState == 2) {
+    restart();
   }
 }
 
@@ -84,12 +105,36 @@ void drawRacket() {
   rect(mouseX, mouseY, racketWidth, racketHeight);
 }
 
+void drawHealthBar() {
+  noStroke();
+  fill(236, 240, 241);
+  rectMode(CORNER);
+  rect(ballX - (healthBarWidth / 2), ballY - 30, healthBarWidth, 5);
+  if (health > 60) {
+    fill(46, 204, 133);
+  } else if (health > 30) {
+    fill(230, 126, 34);
+  } else {
+    fill(231, 76, 60);
+  }
+  rectMode(CORNER);
+  rect(ballX - (healthBarWidth / 2), ballY - 30, healthBarWidth * (health / maxHealth), 5);
+}
+
+void decreaseHealth() {
+  health -= healthDecrease;
+  if (health <= 0) {
+    gameOverScreen();
+    gameState = 2;
+  }
+}
+
 void wallAdder() {
   if (millis() - lastAddTime > wallInterval) {
     int randHeight = round(random(minGapHeight, maxGapHeight));
     int randY = round(random(0, height - randHeight));
 
-    int[] randWall = {width, randY, wallWidth, randHeight};
+    int[] randWall = {width, randY, wallWidth, randHeight, 0};
     walls.add(randWall);
     lastAddTime = millis();
   }
@@ -99,6 +144,7 @@ void wallHandler() {
   wallRemover(i);
   wallMover(i);
   wallDrawer(i);
+  watchWallCollision(i);
   }
 }
 void wallDrawer(int index) {
@@ -185,4 +231,67 @@ void watchRacketBounce() {
       }
     }
   }
+}
+
+void watchWallCollision(int index) {
+  int[] wall = walls.get(index);
+  int gapWallX = wall[0];
+  int gapWallY = wall[1];
+  int gapWallWidth = wall[2];
+  int gapWallHeight = wall[3];
+  int wallScored = wall[4];
+  int wallTopX = gapWallX;
+  int wallTopY = 0;
+  int wallTopWidth = gapWallWidth;
+  int wallTopHeight = gapWallY;
+  int wallBottomX = gapWallX;
+  int wallBottomY = gapWallY+gapWallHeight;
+  int wallBottomWidth = gapWallWidth;
+  int wallBottomHeight = height-(gapWallY+gapWallHeight);
+  if (
+    (ballX+(ballSize/2)>wallTopX) &&
+    (ballX-(ballSize/2)<wallTopX+wallTopWidth) &&
+    (ballY+(ballSize/2)>wallTopY) &&
+    (ballY-(ballSize/2)<wallTopY+wallTopHeight)
+    ) {
+    decreaseHealth();
+  }
+  if (
+    (ballX+(ballSize/2)>wallBottomX) &&
+    (ballX-(ballSize/2)<wallBottomX+wallBottomWidth) &&
+    (ballY+(ballSize/2)>wallBottomY) &&
+    (ballY-(ballSize/2)<wallBottomY+wallBottomHeight)
+    ) {
+    decreaseHealth();
+  }
+  if (ballX > gapWallX + (gapWallWidth / 2) && wallScored == 0) {
+    wallScored = 1;
+    wall[4] = 1;
+    score();
+  }
+}
+
+void score() {
+  score++;
+}
+
+void printScore() {
+  textAlign(CENTER);
+  if (gameState == 1) {
+    fill(0);
+  } else {
+    fill(255);
+  }
+  textSize(30);
+  text(score, height / 2, 50);
+}
+
+void restart() {
+  score = 0;
+  health = maxHealth;
+  ballX = width / 4;
+  ballY = height / 5;
+  lastAddTime = 0;
+  walls.clear();
+  gameState = 0;
 }
