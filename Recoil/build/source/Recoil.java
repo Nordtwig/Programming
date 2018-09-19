@@ -27,6 +27,7 @@ int racketBounceRate = 20;
 
 float gravity = 1;
 float ballSpeedVert = 0;
+float ballSpeedHorizon = 10;
 float airFriction = 0.0002f;
 float friction = 0.15f;
 
@@ -58,6 +59,7 @@ public void gameScreen() {
   drawRacket();
   watchRacketBounce();
   applyGravity();
+  applyHorizontalSpeed();
   keepInScreen();
 }
 public void gameOverScreen() {
@@ -91,12 +93,23 @@ public void applyGravity() {
   ballSpeedVert -= (ballSpeedVert * airFriction);
 }
 
+public void applyHorizontalSpeed() {
+  ballX += ballSpeedHorizon;
+  ballSpeedHorizon -= (ballSpeedHorizon * airFriction);
+}
+
 public void keepInScreen() {
   if (ballY + (ballSize / 2) > height) {
     makeBounceBottom(height);
   }
   if (ballY + (ballSize / 2) < 0) {
     makeBounceTop(0);
+  }
+  if (ballX - (ballSize / 2) < 0) {
+    makeBounceLeft(0);
+  }
+  if (ballX + (ballSize / 2) > width) {
+    makeBounceRight(width);
   }
 }
 
@@ -110,6 +123,18 @@ public void makeBounceTop(float surface) {
   ballY = surface + (ballSize / 2);
   ballSpeedVert *= -1;
   ballSpeedVert -= (ballSpeedVert * friction);
+}
+
+public void makeBounceLeft(float surface) {
+  ballX = surface + (ballSize / 2);
+  ballSpeedHorizon *= -1;
+  ballSpeedHorizon -= (ballSpeedHorizon * friction);
+}
+
+public void makeBounceRight(float surface) {
+  ballX = surface - (ballSize / 2);
+  ballSpeedHorizon *= -1;
+  ballSpeedHorizon -= (ballSpeedHorizon * friction);
 }
 
 public void watchRacketBounce() {
