@@ -15,9 +15,16 @@ import java.io.IOException;
 public class Recoil extends PApplet {
 
 int gameState = 0;
+int ballX, ballY;
+int ballSize = 20;
+int ballColor = color(0);
+float gravity = 1;
+float ballSpeedVert = 0;
 
 public void setup() {
   
+  ballX = width / 4;
+  ballY = height / 5;
 }
 
 public void draw() {
@@ -38,6 +45,9 @@ public void initScreen() {
 }
 public void gameScreen() {
   background(255);
+  drawBall();
+  applyGravity();
+  keepInScreen();
 }
 public void gameOverScreen() {
 
@@ -52,6 +62,37 @@ public void mousePressed() {
 public void startGame() {
   gameState = 1;
 }
+
+public void drawBall() {
+  fill(ballColor);
+  ellipse(ballX, ballY, ballSize, ballSize);
+}
+
+public void applyGravity() {
+  ballSpeedVert += gravity;
+  ballY += ballSpeedVert;
+}
+
+public void keepInScreen() {
+  if (ballY + (ballSize / 2) > height) {
+    ballY = height - (ballSize / 2);
+    ballSpeedVert *= -1;
+  }
+  if (ballY + (ballSize / 2) < 0) {
+    ballY = 0 + (ballSize / 2);
+    ballSpeedVert *= -1;
+  }
+}
+
+// void makeBounceBottom(float surface) {
+//   ballY = surface - (ballSize / 2);
+//   ballSpeedVert *= -1;
+// }
+//
+// void makeBounceTop(float surface) {
+//   ballY = surface + (ballSize / 2);
+//   ballSpeedVert *= -1;
+// }
   public void settings() {  size(500, 500); }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "Recoil" };
