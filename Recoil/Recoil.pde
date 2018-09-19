@@ -1,13 +1,17 @@
 int gameState = 0;
+
+color ballColor = color(0);
 int ballX, ballY;
 int ballSize = 20;
-int ballColor = color(0);
 
+color racketColor = color(0);
+float racketWidth = 100;
+float racketHeight = 10;
 
 float gravity = 1;
 float ballSpeedVert = 0;
-float airFriction = 0.0001;
-float friction = 0.1;
+float airFriction = 0.0002;
+float friction = 0.15;
 
 void setup() {
   size(500, 500);
@@ -34,6 +38,7 @@ void initScreen() {
 void gameScreen() {
   background(255);
   drawBall();
+  drawRacket();
   applyGravity();
   keepInScreen();
 }
@@ -54,6 +59,12 @@ void startGame() {
 void drawBall() {
   fill(ballColor);
   ellipse(ballX, ballY, ballSize, ballSize);
+}
+
+void drawRacket() {
+  fill(racketColor);
+  rectMode(CENTER);
+  rect(mouseX, mouseY, racketWidth, racketHeight);
 }
 
 void applyGravity() {
