@@ -25,6 +25,16 @@ float racketWidth = 100;
 float racketHeight = 10;
 int racketBounceRate = 20;
 
+int wallSpeed = 5;
+int wallInterval = 1000;
+float lastAddTime = 0;
+int minGapHeight = 200;
+int maxGapHeight = 300;
+int wallWidth = 80;
+int wallColors = color(0);
+
+ArrayList<int[]> walls = new ArrayList<int[]>();
+
 float gravity = 1;
 float ballSpeedVert = 0;
 float ballSpeedHorizon = 10;
@@ -55,9 +65,12 @@ public void initScreen() {
 }
 public void gameScreen() {
   background(255);
+  noCursor();
   drawBall();
   drawRacket();
   watchRacketBounce();
+  wallAdder();
+  wallHandler();
   applyGravity();
   applyHorizontalSpeed();
   keepInScreen();
@@ -85,6 +98,45 @@ public void drawRacket() {
   fill(racketColor);
   rectMode(CENTER);
   rect(mouseX, mouseY, racketWidth, racketHeight);
+}
+
+public void wallAdder() {
+  if (millis() - lastAddTime > wallInterval) {
+    int randHeight = round(random(minGapHeight, maxGapHeight));
+    int randY = round(random(0, height - randHeight));
+
+    int[] randWall = {width, randY, wallWidth, randHeight};
+    walls.add(randWall);
+    lastAddTime = millis();
+  }
+}
+public void wallHandler() {
+  for (int i = 0; i < walls.size(); i++) {
+  wallRemover(i);
+  wallMover(i);
+  wallDrawer(i);
+  }
+}
+public void wallDrawer(int index) {
+  int[] wall = walls.get(index);
+  int gapWallX = wall[0];
+  int gapWallY = wall[1];
+  int gapWallWidth = wall[2];
+  int gapWallHeight = wall[3];
+  rectMode(CORNER);
+  fill(wallColors);
+  rect(gapWallX, 0, gapWallWidth, gapWallY);
+  rect(gapWallX, gapWallY + gapWallHeight, gapWallWidth, height - (gapWallY + gapWallHeight));
+}
+public void wallMover(int index) {
+  int[] wall = walls.get(index);
+  wall[0] -= wallSpeed;
+}
+public void wallRemover(int index) {
+  int[] wall = walls.get(index);
+  if (wall[0] + wall [2] <= 0) {
+    walls.remove(index);
+  }
 }
 
 public void applyGravity() {
@@ -144,6 +196,7 @@ public void watchRacketBounce() {
       makeBounceBottom(mouseY);
       if (overhead < 0) {
         ballY += overhead;
+        ballSpeedHorizon = (ballX - mouseX) / 10;
         ballSpeedVert += overhead;
       }
     }
