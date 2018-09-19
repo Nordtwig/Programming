@@ -1,4 +1,4 @@
-int gameState (0);
+int gameState = 0;
 
 void setup() {
   size(500, 500);
@@ -6,27 +6,30 @@ void setup() {
 
 void draw() {
   if (gameState == 0) {
-    initState();
+    initScreen();
   } else if (gameState == 1) {
-    gameState();
+    gameScreen();
   } else if (gameState == 2) {
-    gameOverState();
+    gameOverScreen();
   }
 }
 
-void initState() {
-
+void initScreen() {
+  background(0);
+  textAlign(CENTER);
+  textSize(20);
+  text("Click to Start", height / 2, width / 2);
 }
-void gameState() {
-
+void gameScreen() {
+  background(255);
 }
-void gameOverState() {
+void gameOverScreen() {
 
 }
 
 public void mousePressed() {
   if (gameState == 0) {
-
+    startGame();
   }
 }
 
