@@ -18,8 +18,12 @@ int gameState = 0;
 int ballX, ballY;
 int ballSize = 20;
 int ballColor = color(0);
+
+
 float gravity = 1;
 float ballSpeedVert = 0;
+float airFriction = 0.0001f;
+float friction = 0.1f;
 
 public void setup() {
   
@@ -71,28 +75,21 @@ public void drawBall() {
 public void applyGravity() {
   ballSpeedVert += gravity;
   ballY += ballSpeedVert;
+  ballSpeedVert -= (ballSpeedVert * airFriction);
 }
 
 public void keepInScreen() {
   if (ballY + (ballSize / 2) > height) {
     ballY = height - (ballSize / 2);
     ballSpeedVert *= -1;
+    ballSpeedVert -= (ballSpeedVert * friction);
   }
   if (ballY + (ballSize / 2) < 0) {
     ballY = 0 + (ballSize / 2);
     ballSpeedVert *= -1;
+    ballSpeedVert -= (ballSpeedVert * friction);
   }
 }
-
-// void makeBounceBottom(float surface) {
-//   ballY = surface - (ballSize / 2);
-//   ballSpeedVert *= -1;
-// }
-//
-// void makeBounceTop(float surface) {
-//   ballY = surface + (ballSize / 2);
-//   ballSpeedVert *= -1;
-// }
   public void settings() {  size(500, 500); }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "Recoil" };

@@ -2,8 +2,12 @@ int gameState = 0;
 int ballX, ballY;
 int ballSize = 20;
 int ballColor = color(0);
+
+
 float gravity = 1;
 float ballSpeedVert = 0;
+float airFriction = 0.0001;
+float friction = 0.1;
 
 void setup() {
   size(500, 500);
@@ -55,15 +59,18 @@ void drawBall() {
 void applyGravity() {
   ballSpeedVert += gravity;
   ballY += ballSpeedVert;
+  ballSpeedVert -= (ballSpeedVert * airFriction);
 }
 
 void keepInScreen() {
   if (ballY + (ballSize / 2) > height) {
     ballY = height - (ballSize / 2);
     ballSpeedVert *= -1;
+    ballSpeedVert -= (ballSpeedVert * friction);
   }
   if (ballY + (ballSize / 2) < 0) {
     ballY = 0 + (ballSize / 2);
     ballSpeedVert *= -1;
+    ballSpeedVert -= (ballSpeedVert * friction);
   }
 }
