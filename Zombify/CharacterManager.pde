@@ -36,6 +36,7 @@ class CharacterManager {
               if (human.size > 0) {
                 characters.add(new Zombie(human.position.x, human.position.y, human.size));
                 human.size = 0;
+                // characters.remove(characters.get(i));
                 humanCount--;
               }
             }
