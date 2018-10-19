@@ -71,7 +71,7 @@ int checkNeighbours(int [][]cells, int x, int y) {
       count += cells[column][row];
     }
   }
-  
+
   count -= cells[x][y];
   return count;
 }
